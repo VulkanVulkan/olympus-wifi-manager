@@ -88,3 +88,7 @@ MIT — see [LICENSE](LICENSE). Please review copyright ownership and replace th
 ## Contributing
 
 Compatibility reports should include camera model, firmware version, Linux distribution, and whether directory listing, thumbnail preview, JPEG download, and ORF download work. Do not publish Wi-Fi passwords or private photos.
+
+## Screenshot
+
+![Olympus Wi-Fi Manager v0.4.2](screenshots/main-window.png)
