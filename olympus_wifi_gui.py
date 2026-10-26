@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
     QAbstractItemView
 )
 from olympus_wifi_manager import discover
+from olympus_camera_detect import detect_camera
 
 
 def photo_url(host, path):
@@ -26,6 +27,20 @@ def photo_url(host, path):
 
 def photo_target(root, photo):
     return root / photo.folder.lstrip("/") / photo.name
+
+
+class DetectionWorker(QThread):
+    """Detect a compatible camera without blocking the GUI."""
+
+    detected = Signal(str)
+    not_found = Signal()
+
+    def run(self):
+        address = detect_camera()
+        if address:
+            self.detected.emit(address)
+        else:
+            self.not_found.emit()
 
 
 class ScanWorker(QThread):
@@ -132,6 +147,7 @@ class Window(QMainWindow):
         self.photos = []
         self.groups = []
         self.scan = self.thumbs = self.transfer = None
+        self.detection = None
         self.thumbnail_cache = {}
         self.checked_keys = set()
 
@@ -143,6 +159,9 @@ class Window(QMainWindow):
         top.addWidget(QLabel("Camera:"))
         self.host = QLineEdit("192.168.0.10")
         top.addWidget(self.host)
+        self.detect_button = QPushButton("Detect Camera")
+        self.detect_button.clicked.connect(self.detect_camera)
+        top.addWidget(self.detect_button)
         self.connect_button = QPushButton("Connect / Refresh")
         self.connect_button.clicked.connect(self.refresh)
         top.addWidget(self.connect_button)
@@ -203,6 +222,34 @@ class Window(QMainWindow):
 
     def key(self, photo):
         return photo.folder + "/" + Path(photo.name).stem
+
+    def detect_camera(self):
+        if self.detection is not None:
+            return
+
+        self.detect_button.setEnabled(False)
+        self.status.setText("Detecting Olympus camera…")
+
+        self.detection = DetectionWorker()
+        self.detection.detected.connect(self.camera_detected)
+        self.detection.not_found.connect(self.camera_not_found)
+        self.detection.finished.connect(self.detection_finished)
+        self.detection.start()
+
+    def camera_detected(self, address):
+        self.host.setText(address)
+        self.status.setText(
+            f"Camera detected at {address}. Click Connect / Refresh."
+        )
+
+    def camera_not_found(self):
+        self.status.setText(
+            "No compatible camera detected. Check Wi-Fi or enter the IP manually."
+        )
+
+    def detection_finished(self):
+        self.detection = None
+        self.detect_button.setEnabled(True)
 
     def refresh(self):
         if self.scan is not None or self.transfer is not None or self.thumbs is not None:
