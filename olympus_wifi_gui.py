@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Olympus Wi-Fi Manager v0.4.2 — Qt photo browser and downloader.
+"""Olympus Wi-Fi Manager v0.5.0 — Qt photo browser and downloader.
 
 Place alongside olympus_wifi_manager.py (v0.1).
 """
@@ -142,7 +142,7 @@ class DownloadWorker(QThread):
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Olympus Wi-Fi Manager v0.4.2")
+        self.setWindowTitle("Olympus Wi-Fi Manager v0.5.0")
         self.resize(980, 650)
         self.photos = []
         self.groups = []

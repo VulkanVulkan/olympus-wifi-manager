@@ -4,12 +4,14 @@ A lightweight Python/Qt application for browsing and downloading original JPEG a
 
 **Hardware tested:** Olympus OM-D E-M1 Mark II, firmware 3.4  
 **Operating system tested:** Ubuntu Studio 26.10 (KDE Plasma)  
-**Release:** v0.4.2 (additional camera compatibility unverified)
+**Release:** v0.5.0 (additional camera compatibility unverified)
 
 This project is independent and not affiliated with OM Digital Solutions or Olympus.
 
 ## Features
 
+- Automatically detect compatible cameras through the active Wi-Fi gateway (Linux/NetworkManager)
+- Support manual camera IP entry when automatic detection is unavailable
 - Enumerate camera photo directories over HTTP
 - Display camera-provided thumbnails
 - Group JPEG and ORF files with matching basenames
@@ -44,7 +46,11 @@ python -m pip install -r requirements.txt
 python3 olympus_wifi_gui.py
 ```
 
-Click **Connect / Refresh**, select photos or groups, choose a destination, then click **Download selected**. Files are saved under `<destination>/DCIM/<camera-folder>/`.
+Click **Detect Camera** to identify a compatible camera on the active Wi-Fi network. The detected address automatically populates the camera IP field; detection does not initiate a connection or download.
+
+Then click **Connect / Refresh**, select photos or groups, choose a destination, and click **Download selected**. Files are saved under `<destination>/DCIM/<camera-folder>/`.
+
+If detection fails, check that the computer is connected to the camera's Wi-Fi network, or enter the camera IP address manually. Automatic detection currently requires Linux, NetworkManager (`nmcli`), and the `ip` command. It checks the active Wi-Fi gateway for a compatible `/DCIM` directory-listing response; it does not scan the network.
 
 The format filter affects which files are downloaded from selected groups. For JPEG+ORF pairs, use **JPEG + RAW** to download both.
 
@@ -72,6 +78,7 @@ Tests use synthetic camera directory listings and local temporary files; they do
 ## Known limitations
 
 - Only the E-M1 Mark II with firmware 3.4 has been tested.
+- Automatic detection may not work when the camera is not the Wi-Fi gateway or uses a different directory protocol.
 - Camera Wi-Fi may disconnect the computer from its usual Internet connection.
 - The camera must remain powered and in Wi-Fi mode.
 - File size verification does not provide cryptographic integrity verification.
@@ -83,7 +90,7 @@ Tests use synthetic camera directory listings and local temporary files; they do
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Please review copyright ownership and replace the placeholder copyright holder before public publication.
+MIT — see [LICENSE](LICENSE).
 
 ## Contributing
 
