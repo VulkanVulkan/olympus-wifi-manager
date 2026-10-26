@@ -223,8 +223,15 @@ class Window(QMainWindow):
     def key(self, photo):
         return photo.folder + "/" + Path(photo.name).stem
 
+
+
     def detect_camera(self):
-        if self.detection is not None:
+        if (
+            self.detection is not None
+            or self.scan is not None
+            or self.thumbs is not None
+            or self.transfer is not None
+        ):
             return
 
         self.detect_button.setEnabled(False)
@@ -251,9 +258,17 @@ class Window(QMainWindow):
         self.detection = None
         self.detect_button.setEnabled(True)
 
+
+
     def refresh(self):
-        if self.scan is not None or self.transfer is not None or self.thumbs is not None:
+        if (
+            self.detection is not None
+            or self.scan is not None
+            or self.transfer is not None
+            or self.thumbs is not None
+        ):
             return
+
         host = self.host.text().strip()
         if not host or any(c in host for c in "/:? #"):
             self.status.setText("Enter a camera IP address, e.g. 192.168.0.10")

@@ -64,9 +64,11 @@ def is_olympus_camera(address):
 
             data = response.read(256 * 1024)
 
-        return (
-            b"wlansd" in data
-            and b"/DCIM" in data
+        return bool(
+            re.search(
+                rb"\bwlansd\s*=\s*new\s+Array\s*\(\s*\)\s*;",
+                data,
+            )
         )
 
     except (OSError, urllib.error.URLError, ValueError):
